@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="global.js"></script>
+<script>
+    function goBackToMainSite() {
+        window.location.href = "index.html"; 
+    }
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        /* Page background */
+        body {
+            min-height: 100vh;
+            background: linear-gradient(320deg, #121212, #1a1a1a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #5a5ad6;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 30px 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            text-transform: lowercase;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* Container for the settings sections */
+        .settings-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        /* Sections styled as cards */
+        .settings-section {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        p {
+            color: #b0b0b0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* Input styling */
+        input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            margin: 10px 0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="url"]:focus {
+            border-color: #5a5ad6;
+        }
+
+        /* Game-style buttons */
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #121212; /* Dark text on green background */
+            background: #4CAF50;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s;
+        }
+
+        button:hover {
+            background: #5a5ad6;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(90, 90, 214, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .status-text {
+            font-weight: bold;
+            color: #5a5ad6;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Settings</h1>
+
+    <div class="settings-container">
+        <section class="settings-section">
+            <h2>about:blank</h2>
+            <p>Open this site in a clean tab to keep your browsing history tidy.</p>
+            <button onclick="openInAboutBlank()">Open in about:blank</button>
+            <p style="font-size: 12px; opacity: 0.6; text-align: center;">
+                Note: This hides the URL and title from the browser bar.
+            </p>
+            <a href="https://math6-math.w3spaces.com/"><button>Go to Homepage</button></a>
+        </section>
+
+
+
+
+        <section id="panickeysettings" class="settings-section">
+            <h2>Panic Key</h2>
+            <p class="status-text" id="currentPanicKey">Panic Key: [Not Set]</p>
+            <p id="instruction">Click the button below, then press any key.</p>
+            <button onclick="changePanicKey()">Change Panic Key</button>
+            
+            <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
+            
+            <p class="status-text" id="currentPanicUrl">Redirect URL:</p>
+            <input type="url" id="panicUrlInput" placeholder="https://www.classroom.google.com">
+            <button onclick="savePanicUrl()">Set Redirect URL</button>
+        </section>
+    </div>
+
+    <script>
+ // Load saved settings when the page opens
+window.onload = function() {
+    const savedKey = localStorage.getItem('panicKey');
+    const savedUrl = localStorage.getItem('panicUrl');
+
+    if (savedKey) {
+        document.getElementById('currentPanicKey').innerText = `Panic Key: [ ${savedKey} ]`;
+    }
+    if (savedUrl) {
+        document.getElementById('panicUrlInput').value = savedUrl;
+        document.getElementById('currentPanicUrl').innerText = `Redirect URL: ${savedUrl}`;
+    }
+};
+
+// 1. Improved about:blank Cloaker
+function openInAboutBlank() {
+    // 1. Get the entire HTML content of the current page
+    const html = document.documentElement.outerHTML;
+    
+    // 2. Create a Blob object from the HTML
+    const blob = new Blob([html], { type: 'text/html' });
+    
+    // 3. Create a local URL for that Blob
+    const blobUrl = URL.createObjectURL(blob);
+
+    // 4. Open a new window
+    const win = window.open('about:blank', '_blank');
+    if (!win) {
+        alert("Pop-up blocked! Please allow pop-ups for this site.");
+        return;
+    }
+
+    // 5. Build the cloaked frame using the Blob URL
+    win.document.body.style.margin = '0';
+    win.document.body.style.height = '100vh';
+    
+    const iframe = win.document.createElement('iframe');
+    iframe.src = blobUrl;
+    iframe.style.border = 'none';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.margin = '0';
+    
+    win.document.body.appendChild(iframe);
+
+    // Optional: Redirect the original tab to a safe site like Google Classroom
+    // window.location.replace('https://classroom.google.com');
+}
+// 2. Set Panic Key
+function changePanicKey() {
+    const statusText = document.getElementById('currentPanicKey');
+    statusText.innerText = "Press any key now...";
+    
+    const listener = (event) => {
+        event.preventDefault(); // Prevent scrolling if space is pressed
+        const pressedKey = event.key;
+        localStorage.setItem('panicKey', pressedKey);
+        statusText.innerText = `Panic Key: [ ${pressedKey} ]`;
+        
+        document.removeEventListener('keydown', listener);
+    };
+    
+    document.addEventListener('keydown', listener);
+}
+
+// 3. Save Redirect URL (with URL Validation)
+function savePanicUrl() {
+    let urlInput = document.getElementById('panicUrlInput').value.trim();
+    
+    if (urlInput) {
+        // Ensure the URL has a protocol, otherwise it will fail to connect
+        if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
+            urlInput = 'https://' + urlInput;
+        }
+        
+        localStorage.setItem('panicUrl', urlInput);
+        document.getElementById('currentPanicUrl').innerText = `Redirect URL: ${urlInput}`;
+        document.getElementById('panicUrlInput').value = urlInput;
+        alert("Redirect URL saved!");
+    }
+}
+
+// 4. Global Listener to trigger the Panic Redirect
+document.addEventListener('keydown', (e) => {
+    const savedKey = localStorage.getItem('panicKey');
+    let savedUrl = localStorage.getItem('panicUrl') || 'https://google.com';
+
+    if (e.key === savedKey) {
+        // Use replace() so the user can't click "Back" to see the site
+        window.location.replace(savedUrl);
+    }
+});
+    </script>
+</body>
+</html>
